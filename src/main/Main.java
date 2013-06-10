@@ -21,6 +21,12 @@ public class Main {
 	private static final float NEAR_PLANE    = 0.001f;
 	private static final float FAR_PLANE     = 100.0f;
 
+	private enum DRAWING_MODE {
+		IMMEDIATE_MODE, DISPLAY_LISTS, VERTEX_ARRAYS, VERTEX_BUFFER_OBJECTS
+	};
+
+	private DRAWING_MODE drawingMode;
+
 	public Main() {
 		initializeProgram();
 		programLoop();
@@ -58,7 +64,7 @@ public class Main {
 	}
 
 	private void initializeVariables() {
-		// TODO: initialize program specific variables
+		drawingMode = DRAWING_MODE.IMMEDIATE_MODE;
 	}
 
 	private void programLoop() {
@@ -75,7 +81,16 @@ public class Main {
 		// clear both buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// TODO: render
+		switch (drawingMode) {
+			case IMMEDIATE_MODE:
+				break;
+			case DISPLAY_LISTS:
+				break;
+			case VERTEX_ARRAYS:
+				break;
+			case VERTEX_BUFFER_OBJECTS:
+				break;
+		}
 	}
 
 	private void update() {
