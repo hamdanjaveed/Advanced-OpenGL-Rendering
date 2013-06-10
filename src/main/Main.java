@@ -24,8 +24,10 @@ public class Main {
 	private enum DRAWING_MODE {
 		IMMEDIATE_MODE, DISPLAY_LISTS, VERTEX_ARRAYS, VERTEX_BUFFER_OBJECTS
 	};
-
 	private DRAWING_MODE drawingMode;
+
+	// display list specific variables
+	private int displayListHandle;
 
 	public Main() {
 		initializeProgram();
@@ -67,6 +69,24 @@ public class Main {
 		// initially set the drawing mode to immediate mode
 		drawingMode = DRAWING_MODE.IMMEDIATE_MODE;
 		System.out.println("Now drawing in immediate mode");
+
+		// initialize the display list
+		initializeDisplayList();
+	}
+
+	private void initializeDisplayList() {
+		// create the display list
+		displayListHandle = glGenLists(1);
+		glNewList(displayListHandle, GL_COMPILE); {
+			glBegin(GL_TRIANGLES); {
+				glColor3f(1, 0, 0);
+				glVertex3f(- 0.5f, - 0.5f, - 1.0f);
+				glColor3f(0, 1, 0);
+				glVertex3f(0.5f, - 0.5f, - 1.0f);
+				glColor3f(0, 0, 1);
+				glVertex3f(0.5f, 0.5f, - 1.0f);
+			} glEnd();
+		} glEndList();
 	}
 
 	private void programLoop() {
@@ -97,6 +117,8 @@ public class Main {
 				} glEnd();
 				break;
 			case DISPLAY_LISTS:
+				// render triangle using display lists
+				glCallList(displayListHandle);
 				break;
 			case VERTEX_ARRAYS:
 				break;
@@ -106,10 +128,18 @@ public class Main {
 	}
 
 	private void update() {
-		// if the '1' key is pressed, switch to immediate mode
-		if (Keyboard.isKeyDown(Keyboard.KEY_1)) {
-			drawingMode = DRAWING_MODE.IMMEDIATE_MODE;
-			System.out.println("Now drawing in immediate Mode");
+		while (Keyboard.next()) {
+			// if the '1' key is pressed, switch to immediate mode
+			if (Keyboard.isKeyDown(Keyboard.KEY_1)) {
+				drawingMode = DRAWING_MODE.IMMEDIATE_MODE;
+				System.out.println("Now drawing in immediate Mode");
+			}
+
+			// if the '2' key is pressed, switch to using display lists
+			if (Keyboard.isKeyDown(Keyboard.KEY_2)) {
+				drawingMode = DRAWING_MODE.DISPLAY_LISTS;
+				System.out.println("Now drawing using display lists");
+			}
 		}
 	}
 
@@ -120,7 +150,7 @@ public class Main {
 	}
 
 	private void destroyBuffers() {
-		// TODO: destroy buffers
+		glDeleteLists(displayListHandle, 1);
 	}
 
 	public static void main(String[] args) {
