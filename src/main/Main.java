@@ -1,9 +1,12 @@
 package main;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
@@ -28,6 +31,15 @@ public class Main {
 
 	// display list specific variables
 	private int displayListHandle;
+
+	// vertex array specific variables
+	FloatBuffer vertexFloatBuffer;
+	FloatBuffer colorFloatBuffer;
+
+	// vertex array and buffer object specific variables
+	private final int numberOfVertices = 3;
+	private final int vertexDimensions = 3;
+	private final int colorDimensions = 3;
 
 	public Main() {
 		initializeProgram();
@@ -72,6 +84,9 @@ public class Main {
 
 		// initialize the display list
 		initializeDisplayList();
+
+		// initialize the vertex array
+		initializeVertexArray();
 	}
 
 	private void initializeDisplayList() {
@@ -87,6 +102,26 @@ public class Main {
 				glVertex3f(0.5f, 0.5f, - 1.0f);
 			} glEnd();
 		} glEndList();
+	}
+
+	private void initializeVertexArray() {
+		vertexFloatBuffer = BufferUtils.createFloatBuffer(numberOfVertices * vertexDimensions);
+		float[] vertexData = new float[] {
+			-0.5f, -0.5f, -1.0f,
+			0.5f, -0.5f, -1.0f,
+			0.5f, 0.5f, -1.0f
+		};
+		vertexFloatBuffer.put(vertexData);
+		vertexFloatBuffer.flip();
+
+		colorFloatBuffer = BufferUtils.createFloatBuffer(numberOfVertices * colorDimensions);
+		float[] colorData = new float[] {
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
+		};
+		colorFloatBuffer.put(colorData);
+		colorFloatBuffer.flip();
 	}
 
 	private void programLoop() {
@@ -121,6 +156,21 @@ public class Main {
 				glCallList(displayListHandle);
 				break;
 			case VERTEX_ARRAYS:
+				// render triangle using vertex arrays
+				// enable vertex arrays
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glEnableClientState(GL_COLOR_ARRAY);
+
+				// tell opengl where the data is
+				glVertexPointer(vertexDimensions, 0, vertexFloatBuffer);
+				glColorPointer(colorDimensions, 0, colorFloatBuffer);
+
+				// draw the triangle
+				glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+
+				// disable the vertex arrays
+				glDisableClientState(GL_VERTEX_ARRAY);
+				glDisableClientState(GL_COLOR_ARRAY);
 				break;
 			case VERTEX_BUFFER_OBJECTS:
 				break;
@@ -131,14 +181,26 @@ public class Main {
 		while (Keyboard.next()) {
 			// if the '1' key is pressed, switch to immediate mode
 			if (Keyboard.isKeyDown(Keyboard.KEY_1)) {
-				drawingMode = DRAWING_MODE.IMMEDIATE_MODE;
-				System.out.println("Now drawing in immediate Mode");
+				if (drawingMode != DRAWING_MODE.IMMEDIATE_MODE) {
+					drawingMode = DRAWING_MODE.IMMEDIATE_MODE;
+					System.out.println("Now drawing in immediate Mode");
+				}
 			}
 
 			// if the '2' key is pressed, switch to using display lists
 			if (Keyboard.isKeyDown(Keyboard.KEY_2)) {
-				drawingMode = DRAWING_MODE.DISPLAY_LISTS;
-				System.out.println("Now drawing using display lists");
+				if (drawingMode != DRAWING_MODE.DISPLAY_LISTS) {
+					drawingMode = DRAWING_MODE.DISPLAY_LISTS;
+					System.out.println("Now drawing using display lists");
+				}
+			}
+
+			// if the '3' key is pressed, switch to using vertex arrays
+			if (Keyboard.isKeyDown(Keyboard.KEY_3)) {
+				if (drawingMode != DRAWING_MODE.VERTEX_ARRAYS) {
+					drawingMode = DRAWING_MODE.VERTEX_ARRAYS;
+					System.out.println("Now drawing using vertex arrays");
+				}
 			}
 		}
 	}
