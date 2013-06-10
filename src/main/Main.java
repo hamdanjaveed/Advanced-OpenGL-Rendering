@@ -194,18 +194,21 @@ public class Main {
 				glDisableClientState(GL_COLOR_ARRAY);
 				break;
 			case VERTEX_BUFFER_OBJECTS:
+				// enable vertex buffer objects
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glEnableClientState(GL_COLOR_ARRAY);
+
 				glBindBuffer(GL_ARRAY_BUFFER, vboVertexHandle);
 				glVertexPointer(vertexDimensions, GL_FLOAT, 0, 0L);
 
 				glBindBuffer(GL_ARRAY_BUFFER, vboColorHandle);
 				glColorPointer(colorDimensions, GL_FLOAT, 0, 0L);
 
-				// enable vertex buffer objects
-				glEnableClientState(GL_VERTEX_ARRAY);
-				glEnableClientState(GL_COLOR_ARRAY);
-
 				// draw the triangle
 				glDrawArrays(GL_TRIANGLES, 0, numberOfVertices);
+
+				// reset the array buffer so that the vertex array can use it
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				// disable the vertex buffer objects
 				glDisableClientState(GL_VERTEX_ARRAY);
@@ -257,7 +260,12 @@ public class Main {
 	}
 
 	private void destroyBuffers() {
+		// delete display lists
 		glDeleteLists(displayListHandle, 1);
+
+		// delete vertex buffers
+		glDeleteBuffers(vboVertexHandle);
+		glDeleteBuffers(vboColorHandle);
 	}
 
 	public static void main(String[] args) {
