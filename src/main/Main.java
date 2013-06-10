@@ -64,7 +64,9 @@ public class Main {
 	}
 
 	private void initializeVariables() {
+		// initially set the drawing mode to immediate mode
 		drawingMode = DRAWING_MODE.IMMEDIATE_MODE;
+		System.out.println("Now drawing in immediate mode");
 	}
 
 	private void programLoop() {
@@ -81,8 +83,18 @@ public class Main {
 		// clear both buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// render a triangle using whichever mode is selected
 		switch (drawingMode) {
 			case IMMEDIATE_MODE:
+				// render triangle using immediate mode
+				glBegin(GL_TRIANGLES); {
+					glColor3f(1, 0, 0);
+					glVertex3f(- 0.5f, - 0.5f, - 1.0f);
+					glColor3f(0, 1, 0);
+					glVertex3f(0.5f, - 0.5f, - 1.0f);
+					glColor3f(0, 0, 1);
+					glVertex3f(0.5f, 0.5f, - 1.0f);
+				} glEnd();
 				break;
 			case DISPLAY_LISTS:
 				break;
@@ -94,7 +106,11 @@ public class Main {
 	}
 
 	private void update() {
-		// TODO: update
+		// if the '1' key is pressed, switch to immediate mode
+		if (Keyboard.isKeyDown(Keyboard.KEY_1)) {
+			drawingMode = DRAWING_MODE.IMMEDIATE_MODE;
+			System.out.println("Now drawing in immediate Mode");
+		}
 	}
 
 	private void exitProgram() {
